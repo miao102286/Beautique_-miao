@@ -1,52 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Carousel from 'react-bootstrap/Carousel';
+import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
+import Carousel from 'react-bootstrap/Carousel'
 // import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
 
 // 在 index.js 或 App.js 文件中引入
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 import {
   PiHeartStraight,
   PiHeartStraightFill,
   PiChatCircle,
-} from 'react-icons/pi';
+} from 'react-icons/pi'
 // import { Swiper, SwiperSlide } from 'swiper/react';
 // import 'swiper/swiper-bundle.min.css';
-import { FgThumbsUp, FgThumbUpFill } from '@/components/icons/figma';
+import { FgThumbsUp, FgThumbUpFill } from '@/components/icons/figma'
 
-import styles from './index.module.scss';
-import ReplyInfo from '../reply-info';
-export default function PostCard1(props) {
-  //有多icon 狀態初始化為物件
-  // const [hover, setHover] = useState({
-  //   1: false,
-  //   2: false,
-  //   3: false,
-  // });
-  const [active, setActive] = useState({});
+import styles from './index.module.scss'
+import ReplyInfo from '../reply-info'
+export default function PostCard1({
+  title,
+  content,
+  tags,
+  postCreateTime,
+  likeCount,
+  commentCount,
+  postImage,
+  authorAvatar,
+  authorName,
+  commentAuthorAvatar,
+  commentAuthorName,
+  commentCreateTime,
+  commentContent,
+  commentLikeCount,
+  commentReplyCount,
+}) {
+  const [active, setActive] = useState({})
   const icons = [
     {
       id: 1,
       default: <FgThumbsUp height="26" width="26" fill="#8A8A8A" />,
-      hover: <FgThumbUpFill height="26" width="26" fill="#8A8A8A" />,
-      // active: <RiThumbUpFill size={26} fill="red" />,
+      active: <FgThumbUpFill height="26" width="26" fill="#8A8A8A" />,
     },
     {
       id: 2,
       default: <PiHeartStraight size={26} fill="#8A8A8A" />,
-      hover: <PiHeartStraightFill size={26} fill="#963827" />,
+      active: <PiHeartStraightFill size={26} fill="#963827" />,
     },
     {
       id: 3,
       default: <PiChatCircle size={26} fill="#8A8A8A" />,
-      hover: <PiChatCircle size={26} fill="#8A8A8A" />,
+      active: <PiChatCircle size={26} fill="#8A8A8A" />,
     },
-  ];
-  const [inputValue, setInputValue] = useState('');
-  const [focus, setFocus] = useState(false);
-  const [user, setUser] = useState('');
-  const [reply, setReply] = useState('');
+  ]
+  const [inputValue, setInputValue] = useState('')
+  const [focus, setFocus] = useState(false)
+  const [user, setUser] = useState('')
+  const [reply, setReply] = useState('')
   // const FocusHandle = (e) => {
   //   setFocus(true);
   //   // setInputValue(e.target.value);
@@ -55,24 +64,24 @@ export default function PostCard1(props) {
   //   // }
   // };
   const cancelHandle = (e) => {
-    e.preventDefault();
-    setInputValue('');
-    setFocus(false);
-    setUser('');
-    setReply('');
-  };
+    e.preventDefault()
+    setInputValue('')
+    setFocus(false)
+    setUser('')
+    setReply('')
+  }
   const replyHandle = (text, user) => {
-    setUser(user);
-    setReply(text);
-    setFocus(true);
-  };
+    setUser(user)
+    setReply(text)
+    setFocus(true)
+  }
   const iconHandle = (iconId) => {
     //先複製原本的狀態 然後動態搜尋 改相反
     setActive((prevState) => ({
       ...prevState,
       [iconId]: !prevState[iconId],
-    }));
-  };
+    }))
+  }
 
   return (
     <>
@@ -99,15 +108,6 @@ export default function PostCard1(props) {
                 height={720}
               />
             </Carousel.Item>
-            <Carousel.Item>
-              <Image
-                className={styles['user-image']}
-                src="/post/p2_1.webp"
-                alt="User Image"
-                width={600}
-                height={720}
-              />
-            </Carousel.Item>
           </Carousel>
         </div>
         {/* post-text */}
@@ -126,25 +126,13 @@ export default function PostCard1(props) {
           {/* mid-content */}
           <div className={styles['post-info-wrap']}>
             <div className={styles['post-info']}>
-              <div className={`${styles['info-title']} h6`}>
-                近期愛用的粉底! 一整天都不會脫妝
-              </div>
+              <div className={`${styles['info-title']} h6`}>{title}</div>
               <div>
-                <span className={styles['info-content']}>
-                  不知不覺又到了一年最後一個月 NARS推出流金夜閃系列✨
-                  一起用最有氛圍感的派對妝容 來迎接年末派對時刻！
-                  不知不覺又到了一年最後一個月 NARS推出流金夜閃系列✨
-                  一起用最有氛圍感的派對妝容 來迎接年末派對時刻！
-                  起用最有氛圍感的派對妝容 來迎接年末派對時刻！
-                  不知不覺又到了一年最後一個月 NARS推出流金夜閃系列✨
-                  一起用最有氛圍感的派對妝容起用最有氛圍感的派對妝容
-                  來迎接年末派對時刻！ 不知不覺又到了一年最後一個月
-                  NARS推出流金夜閃系列✨ 一起用最有氛圍感的派對妝容
-                </span>
+                <span className={styles['info-content']}>{content}</span>
                 <span>#NARS</span>
                 <span>#聖誕派對</span>
               </div>
-              <div className={styles['info-date']}>2024-06-11 18:45</div>
+              <div className={styles['info-date']}>{postCreateTime}</div>
             </div>
             <hr className={styles['line']} />
             {/* reply */}
@@ -213,9 +201,9 @@ export default function PostCard1(props) {
                   {icons.map((icon) => (
                     <div key={icon.id}>
                       <div onClick={(e) => iconHandle(icon.id)}>
-                        {active[icon.id] ? icon.hover : icon.default}
+                        {active[icon.id] ? icon.active : icon.default}
                       </div>
-                      <span>10</span>
+                      <span>{likeCount}</span>
                     </div>
                   ))}
                 </div>
@@ -235,5 +223,5 @@ export default function PostCard1(props) {
         </div>
       </div>
     </>
-  );
+  )
 }

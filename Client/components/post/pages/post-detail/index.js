@@ -1,13 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { MdOutlineArrowBack } from 'react-icons/md';
-import { GoArrowLeft } from 'react-icons/go';
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { GoArrowLeft } from 'react-icons/go'
+import axios from 'axios'
+import PostCard from '@/components/post/common/post-card'
+import WallCard from '@/components/post/common/wall-card'
+import Header from '@/components/home/common/header'
+import styles from './index.module.scss'
+import Link from 'next/link'
 
-import PostCard from '@/components/post/common/post-card';
-import WallCard from '@/components/post/common/wall-card';
-import Header from '@/components/home/common/header';
-import styles from './index.module.scss';
-import Link from 'next/link';
 export default function Explore(props) {
+  const [postCard, setPostCard] = useState([])
+
+  const router = useRouter()
+  const { postId } = router.query
+  useEffect(() => {
+    async function getPublishCard() {
+      if (postId) {
+        try {
+          let response = await axios.get(
+            `http://localhost:3005/api/post/post_wall/${postId}`,
+            {
+              withCredentials: true,
+            }
+          )
+          setPostCard(response.data)
+        } catch (error) {
+          console.error('Error fetching publish card data:', error)
+        }
+      }
+    }
+    console.log(postId)
+    setPostCard()
+  }, [postId])
   return (
     <>
       <Header />
@@ -38,5 +62,5 @@ export default function Explore(props) {
         </div>
       </div>
     </>
-  );
+  )
 }

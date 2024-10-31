@@ -17,7 +17,7 @@ export default function PostWall(props) {
           withCredentials: true,
         }
       )
-      setWallCard(response.data.data)
+      setWallCard(response.data)
     }
     getWallCard()
   }, [])
