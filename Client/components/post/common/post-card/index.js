@@ -1,38 +1,31 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { format } from 'date-fns'
+import { useRouter } from 'next/router'
 import Carousel from 'react-bootstrap/Carousel'
-// import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
-
-// 在 index.js 或 App.js 文件中引入
 import 'bootstrap/dist/css/bootstrap.min.css'
-
+import axios from 'axios'
 import {
   PiHeartStraight,
   PiHeartStraightFill,
   PiChatCircle,
 } from 'react-icons/pi'
-// import { Swiper, SwiperSlide } from 'swiper/react';
-// import 'swiper/swiper-bundle.min.css';
+import { usePost } from '@/hooks/post/use-post'
 import { FgThumbsUp, FgThumbUpFill } from '@/components/icons/figma'
 
 import styles from './index.module.scss'
 import ReplyInfo from '../reply-info'
+import { ImageSquare } from '@phosphor-icons/react'
 export default function PostCard1({
+  postAuthor,
   title,
   content,
   tags,
-  postCreateTime,
+  postImages,
   likeCount,
+  saveCount,
   commentCount,
-  postImage,
-  authorAvatar,
-  authorName,
-  commentAuthorAvatar,
-  commentAuthorName,
-  commentCreateTime,
-  commentContent,
-  commentLikeCount,
-  commentReplyCount,
+  postCreateTime,
 }) {
   const [active, setActive] = useState({})
   const icons = [
@@ -56,6 +49,17 @@ export default function PostCard1({
   const [focus, setFocus] = useState(false)
   const [user, setUser] = useState('')
   const [reply, setReply] = useState('')
+
+  const formattedTime = postCreateTime
+    ? format(new Date(postCreateTime), 'yyyy-MM-dd HH:mm')
+    : 'Loading...'
+  // console.log(postImages)
+  let { post } = usePost()
+
+  if (!post) {
+    return <p>Loading...</p>
+  }
+  const { comments } = post
   // const FocusHandle = (e) => {
   //   setFocus(true);
   //   // setInputValue(e.target.value);
@@ -89,25 +93,19 @@ export default function PostCard1({
         {/* post-img with Sw*/}
         <div className={styles['post-img']}>
           <Carousel interval={null}>
-            <Carousel.Item>
-              <Image
-                className={styles['user-image']}
-                src="/post/p2_1.webp"
-                alt="User Image"
-                width={600}
-                height={650}
-                objectFit="cover"
-              />
-            </Carousel.Item>
-            <Carousel.Item>
-              <Image
-                className={styles['user-image']}
-                src="/post/p1_1.webp"
-                alt="User Image"
-                width={600}
-                height={720}
-              />
-            </Carousel.Item>
+            {postImages.split(',').map((image, index) => (
+              <Carousel.Item key={index}>
+                <Image
+                  className={styles['user-image']}
+                  src={`/post/${image}`}
+                  alt="User Image"
+                  // fill
+                  // layout="responsive"
+                  width={600}
+                  height={650}
+                />
+              </Carousel.Item>
+            ))}
           </Carousel>
         </div>
         {/* post-text */}
@@ -121,7 +119,7 @@ export default function PostCard1({
               width={40}
               height={40}
             />
-            <div className={styles['user-name']}>Cleo</div>
+            <div className={styles['user-name']}>{postAuthor}</div>
           </div>
           {/* mid-content */}
           <div className={styles['post-info-wrap']}>
@@ -129,55 +127,32 @@ export default function PostCard1({
               <div className={`${styles['info-title']} h6`}>{title}</div>
               <div>
                 <span className={styles['info-content']}>{content}</span>
-                <span>#NARS</span>
-                <span>#聖誕派對</span>
+                {tags.split(',').map((tag, index) => (
+                  <span key={index}>#{tag}</span>
+                ))}
               </div>
-              <div className={styles['info-date']}>{postCreateTime}</div>
+              <div className={styles['info-date']}>{formattedTime}</div>
             </div>
             <hr className={styles['line']} />
             {/* reply */}
             <div className={styles['post-reply']}>
-              <div className={styles['reply-amount']}>共有2條評論</div>
-              <div className={styles['reply-wrap']}>
-                <div className={styles['reply-big-container']}>
-                  <div className={styles['reply-big']}>
-                    <Image
-                      className={styles['user-image']}
-                      src="/post/p2_1.webp"
-                      alt="User Image"
-                      width={40}
-                      height={40}
-                    />
-                    <ReplyInfo
-                      onReplyClick={replyHandle}
-                      username="Anna"
-                      datetime="2022-12-12 12:12:12"
-                      replyContent="新的遮瑕膏測評! 遮瑕力超強"
-                      likeCount={15}
-                      replyCount={10}
-                    />
-                  </div>
-                  <div className={styles['reply-small-container']}>
-                    <div className={styles['reply-small']}>
-                      <Image
-                        className={styles['user-image']}
-                        src="/post/p1_1.webp"
-                        alt="User Image"
-                        width={34}
-                        height={34}
-                      />
-                      <ReplyInfo
-                        onReplyClick={replyHandle}
-                        username="Anna"
-                        datetime="2022-12-12 12:12:12"
-                        replyContent="新的遮瑕膏測評! "
-                        likeCount={15}
-                        replyCount={10}
-                      />
-                    </div>
-                    <div className={styles['reply-more']}>展開 3 條回覆</div>
-                  </div>
-                </div>
+              <div className={styles['reply-amount']}>
+                共有{commentCount}條評論
+              </div>
+              <div className={styles['reply-container']}>
+                {comments.map((comment) => (
+                  <ReplyInfo
+                    key={comment.comment_id}
+                    onReplyClick={replyHandle}
+                    comments={comment}
+                    commentAuthor={comment.comment_author_nickname}
+                    commentCreateTime={comment.created_at}
+                    commentContent={comment.comment_content}
+                    commentLikeCount={comment.comment_like_count}
+                    commentReplyCount={comment.comment_reply_count}
+                  />
+                ))}
+                <div className={styles['reply-more']}>展開 3 條回覆</div>
               </div>
             </div>
           </div>
@@ -203,7 +178,15 @@ export default function PostCard1({
                       <div onClick={(e) => iconHandle(icon.id)}>
                         {active[icon.id] ? icon.active : icon.default}
                       </div>
-                      <span>{likeCount}</span>
+                      <span>
+                        {icon.id === 1
+                          ? likeCount
+                          : icon.id === 2
+                          ? saveCount
+                          : icon.id === 3
+                          ? commentCount
+                          : 1}
+                      </span>
                     </div>
                   ))}
                 </div>
