@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { format } from 'date-fns'
-import { useRouter } from 'next/router'
 import Carousel from 'react-bootstrap/Carousel'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import axios from 'axios'
 import {
   PiHeartStraight,
   PiHeartStraightFill,
@@ -52,7 +50,7 @@ export default function PostCard1({
 
   const formattedTime = postCreateTime
     ? format(new Date(postCreateTime), 'yyyy-MM-dd HH:mm')
-    : 'Loading...'
+    : ''
   // console.log(postImages)
   let { post } = usePost()
 
@@ -152,7 +150,6 @@ export default function PostCard1({
                     commentReplyCount={comment.comment_reply_count}
                   />
                 ))}
-                <div className={styles['reply-more']}>展開 3 條回覆</div>
               </div>
             </div>
           </div>

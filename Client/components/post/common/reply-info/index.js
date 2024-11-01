@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react'
 import Image from 'next/image'
+import { format } from 'date-fns'
+
 import { PiChatCircle } from 'react-icons/pi'
 import { FgThumbsUp, FgThumbUpFill } from '@/components/icons/figma'
 import styles from './index.module.scss'
@@ -16,7 +18,10 @@ export default function ReplyInfo({
   const userRef = useRef()
   const replyRef = useRef()
   const [active, setActive] = useState(false)
-
+  const [show, setShow] = useState(false)
+  const formattedTime = commentCreateTime
+    ? format(new Date(commentCreateTime), 'yyyy-MM-dd HH:mm')
+    : ''
   const handle = () => {
     setActive(!active)
   }
@@ -32,14 +37,22 @@ export default function ReplyInfo({
     const text = replyRef.current.textContent
     onReplyClick(text, user) // 傳遞回父組件
   }
-
+  const showMoreHandle = () => {
+    setShow(!show)
+  }
+  const isRootComment = comments.parent_id === null
   return (
     <>
+      {/* 根評論渲染 */}
       <div
-        className={styles['reply-wrap']}
-        style={{
-          marginLeft: comments?.depth ? comments.depth * 20 + 'px' : '0px',
-        }}
+        className={`${styles['reply-wrap']} ${
+          isRootComment ? styles['root-comment'] : styles['children-comment']
+        }`}
+        style={
+          {
+            // marginLeft: comments?.depth ? comments.depth * 20 + 'px' : '0px',
+          }
+        }
       >
         <Image
           className={styles['user-image']}
@@ -51,7 +64,7 @@ export default function ReplyInfo({
         <div className={styles['reply-info']}>
           <div className={styles['user-name']}>
             <span ref={userRef}>{commentAuthor}</span>
-            <span>{commentCreateTime}</span>
+            <span>{formattedTime}</span>
           </div>
           <div className={styles['user-reply']} ref={replyRef}>
             {commentContent}
@@ -68,14 +81,36 @@ export default function ReplyInfo({
           </div>
         </div>
       </div>
-      {/* 遞迴渲染子評論 */}
+
+      {/* 渲染第一條子評論 */}
       {comments.children && comments.children.length > 0 && (
         <div className={styles['children-comments']}>
-          {comments.children.map((childComment) => (
+          <ReplyInfo
+            key={comments.children[0].comment_id}
+            onReplyClick={onReplyClick}
+            comments={comments.children[0]}
+            commentAuthor={comments.children[0].comment_author_nickname}
+            commentCreateTime={comments.children[0].created_at}
+            commentContent={comments.children[0].comment_content}
+            commentLikeCount={comments.children[0].comment_like_count}
+            commentReplyCount={comments.children[0].comment_reply_count}
+          />
+        </div>
+      )}
+      {/* 展開按鈕 */}
+      {!show && comments.children && comments.children.length > 1 && (
+        <div className={styles['reply-more']} onClick={showMoreHandle}>
+          展開 {comments.children.length - 1} 條回覆
+        </div>
+      )}
+      {/* 顯示剩下的子評論 */}
+      {show && comments.children && comments.children.length > 1 && (
+        <div className={styles['children-comments']}>
+          {comments.children.slice(1).map((childComment) => (
             <ReplyInfo
               key={childComment.comment_id}
               onReplyClick={onReplyClick}
-              comments={childComment} // 子評論的完整資料
+              comments={childComment}
               commentAuthor={childComment.comment_author_nickname}
               commentCreateTime={childComment.created_at}
               commentContent={childComment.comment_content}
